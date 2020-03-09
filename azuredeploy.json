@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "metadata": {
+                "description": "DevTest Lab Name"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "DevTest Lab Region"
+            }
+        },
+        "storageType": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "Type of storage used by the lab. It can be either Premium or Standard. Default is Standard. - Standard, Premium, StandardSSD"
+            }
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DevTestLab/labs",
+            "apiVersion": "2018-09-15",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "tags": {
+            },
+            "properties": {
+                "labStorageType": "[parameters('storageType')]"
+            },
+            "resources": [
+                {
+                    "type": "schedules",
+                    "apiVersion": "2018-09-15",
+                    "name": "LabVmsShutdown",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
+                    ],
+                    "properties": {
+                        "status": "Enabled",
+                        "timeZoneId": "Central Standard Time",
+                        "dailyRecurrence": {
+                            "time": "1900"
+                        },
+                        "taskType": "LabVmsShutdownTask",
+                        "notificationSettings": {
+                            "status": "Disabled",
+                            "timeInMinutes": 30
+                        }
+                    }
+                },
+                {
+                    "type": "virtualNetworks",
+                    "apiVersion": "2018-09-15",
+                    "name": "[concat('vnet-', parameters('name'))]",
+                    "location": "[parameters('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.DevTestLab/labs', parameters('name'))]"
+                    ],
+                    "properties": {}
+                }
+            ]
+        }
+    ],
+    "outputs": {
+    },
+    "functions": [
+    ]
+}
