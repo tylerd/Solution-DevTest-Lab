@@ -10,36 +10,6 @@ namespace SolutionDevTestLab
 {
     class Program
     {
-        static void RunDeploy(IAzure azure)
-        {
-            var name = "tyler-devtestlab";
-            var rgName = $"rg-{name}";
-
-            var deploymentName = SdkContext.RandomResourceName("tyler-deploy", 24);
-
-            var templateJson = Utilities.GetArmTemplate("azuredeploy.json");
-
-            Utilities.Log($"Creating a resource group with name: {rgName}");
-
-            azure.ResourceGroups.Define(rgName)
-                .WithRegion(Region.USWest2)
-                .Create();
-
-            Utilities.Log($"Created a resource group with name: {rgName}");
-
-            Utilities.Log("Starting a deployment for DevTest Lab: " + deploymentName);
-
-            var paramObj = JObject.FromObject(new {name = new { value = name}});
-
-            azure.Deployments.Define(deploymentName)
-                .WithExistingResourceGroup(rgName)
-                .WithTemplate(templateJson)
-                .WithParameters(paramObj)
-                .WithMode(DeploymentMode.Incremental)
-                
-                .Create();
-            
-        }
 
         static void Main(string[] args)
         {
@@ -56,9 +26,13 @@ namespace SolutionDevTestLab
                     .Authenticate(credentials)
                     .WithDefaultSubscription();
 
+                var labSolution = new Solution(azure);
 
+                string name = "tyler-devtestlab";
+                string rgName = $"rg-{name}";
+                Region region = Region.USWest2;
 
-                RunDeploy(azure);
+                labSolution.RunDeploy(name, rgName, region);
 
             } catch (Exception ex) {
                 Utilities.Log(ex);
