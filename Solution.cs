@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.Azure.Management.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
@@ -34,13 +35,22 @@ namespace SolutionDevTestLab
 
             var paramObj = JObject.FromObject(new {name = new { value = name}});
 
-            _azure.Deployments.Define(deploymentName)
+            var deployment = _azure.Deployments.Define(deploymentName)
                 .WithNewResourceGroup(resourceGroupName, region)
                 .WithTemplate(templateJson)
                 .WithParameters(paramObj)
                 .WithMode(DeploymentMode.Incremental)
                 
                 .Create();
+            
+            Utilities.Log("--- Deployment Operations ---");
+            var ops = deployment.DeploymentOperations.List()
+                .OrderBy(o => o.Timestamp);
+
+            foreach (var operation in ops)
+            {
+                Utilities.PrintDeploymentOperation(operation);
+            }            
             
         }        
     }

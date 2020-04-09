@@ -66,6 +66,22 @@ namespace SolutionDevTestLab
             Log(info.ToString());
         }
 
+        public static void PrintDeploymentOperation(IDeploymentOperation operation)
+        {
+            StringBuilder info = new StringBuilder();
+            info.Append("Deployment Operation: ").Append(operation.Timestamp)
+                    .Append($"\n  StatusCode: {operation.StatusCode}");
+                    
+            if(operation.TargetResource != null)
+            {
+                info.Append($"\n  ResourceName: {operation.TargetResource.ResourceName}")
+                    .Append($"\n  ResourceType: {operation.TargetResource.ResourceType}")
+                    .Append($"\n  ResourceId: {operation.TargetResource.Id}");
+            }
+                    
+            Log(info.ToString());
+        }
+
         public static string CreateRandomName(string namePrefix)
         {
             return SdkContext.RandomResourceName(namePrefix, 30);

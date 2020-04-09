@@ -5,13 +5,28 @@ using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CommandLine;
 
 namespace SolutionDevTestLab
 {
     class Program
     {
+        public class Options
+        {
+            [Option('n', "name", HelpText = "Solution Name", Default = "tyler-devtestlab")]
+            public string Name {get; set;}
+        }
 
         static void Main(string[] args)
+        {
+            Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(o =>
+                {
+                    Deploy(o.Name);
+                });
+        }
+
+        static void Deploy(string name)
         {
             try {
                 
@@ -28,7 +43,6 @@ namespace SolutionDevTestLab
 
                 var labSolution = new Solution(azure);
 
-                string name = "tyler-devtestlab";
                 string rgName = $"rg-{name}";
                 Region region = Region.USWest2;
 
