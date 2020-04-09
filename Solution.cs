@@ -10,24 +10,13 @@ namespace SolutionDevTestLab
     public class Solution
     {
         private IAzure _azure;
-        private string _name;
-        private string _resourceGroupName;
-        private Region _region;
 
         public Solution(IAzure azure) => _azure = azure;
-
-        public Solution(IAzure azure, string name, string resourceGroupName, Region region) 
-        {
-            _azure = azure;
-            _name = name;
-            _resourceGroupName = resourceGroupName;
-            _region = region;
-        }
 
         public void RunDeploy(string name, string resourceGroupName, Region region)
         {
 
-            var deploymentName = SdkContext.RandomResourceName("tyler-deploy", 24);
+            var deploymentName = SdkContext.RandomResourceName($"{name}-deploy-", 24);
 
             var templateJson = Utilities.GetArmTemplate("azuredeploy.json");
 
